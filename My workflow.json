@@ -1,0 +1,154 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d0ca2c47-50a4-49d7-9033-6e3d49a06359",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/BSR.VN?interval=1d&range=1d",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "f0f62b94-e690-47ce-8e5f-86f7481bffa4",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "chatId": "8865297707",
+        "text": "=🚨 TÍN HIỆU SĂN ĐIỂM MUA (BSR) 🚨\n-----------------------------------\n📊 Khối lượng khớp: {{ $json.chart.result[0].meta.regularMarketVolume }} cổ phiếu (Đột biến lớn)\n💰 Giá hiện tại: {{ $json.chart.result[0].meta.regularMarketPrice }} VNĐ\n🚀 Tăng trưởng: +{{ $json.chart.result[0].meta.regularMarketChangePercent }}%\n\n👉 Trạng thái: Dòng tiền lớn đã nhập cuộc và đẩy giá bứt phá mạnh! Cân nhắc xem xét giải ngân.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "d1902f80-680e-4f30-bfb0-f59b543d3774",
+      "name": "Send a text message",
+      "webhookId": "b109cbec-faa1-4e3c-b7f6-90f83f9fc115",
+      "credentials": {
+        "telegramApi": {
+          "id": "yVzTN2K0sm2Mp7gY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bb5c8ad4-8a57-44f4-b321-a2f78ad1a1a0",
+              "leftValue": "={{ $json.chart.result[0].meta.regularMarketVolume }}",
+              "rightValue": 5000000,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "fab15bb4-be84-49be-b9e6-0f6383676a7f",
+              "leftValue": "={{ $json.chart.result[0].meta.regularMarketChangePercent }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "8c7230d7-c715-473c-bf5e-af8b5e9d143c",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "99f59ae8-c68c-4af0-befe-08f6dd9a594e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b331c2893c623189bf72c260be32c0421719c9b4b0b7e20cbc5f34d8efacad6f"
+  },
+  "nodeGroups": [],
+  "id": "m3FfOnfw7fTFHIQb",
+  "tags": []
+}
